@@ -3,7 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
+// use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,6 +22,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'address',
+        'city',
+        'zip_code',
+        'country',
+        'phone_number',
+        'profile_image',
+        'profile_completed',
     ];
 
     /**
@@ -32,6 +39,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $appends = [
+        'image_path'
     ];
 
     /**
@@ -45,5 +56,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class)
+            ->with('products')
+            ->latest();
+    }
+
+    public function getImagePathAttribute()
+    {
+        if ($this->profile_image) {
+            return asset($this->profile_image);
+        } else {
+            return "https://pixabay.com/images/download/x-6380868_1920.png";
+        }
     }
 }
